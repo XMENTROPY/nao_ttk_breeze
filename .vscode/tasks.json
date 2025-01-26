@@ -1,0 +1,37 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Push to GitHub",
+        "type": "shell",
+        "command": "git add .; git commit -m \"Automated commit\"; git push",
+        "problemMatcher": []
+      },
+      {
+        "label": "Run Build",
+        "type": "shell",
+        "command": "python -m build",
+        "problemMatcher": [],
+        "dependsOn": ["Push to GitHub"]  // Waits for "Push to GitHub" to finish
+      },
+      {
+        "label": "Upload to PyPI",
+        "type": "shell",
+        "command": "python -m twine upload dist/*",
+        "problemMatcher": [],
+        "dependsOn": ["Run Build"]  // Waits for "Build" to finish
+      },
+      {
+        "label": "Update package locally",
+        "type": "shell",
+        "command": "Get-ChildItem -Path dist -Filter *.tar.gz | ForEach-Object { pip install $_.FullName --force-reinstall }",
+        "problemMatcher": [],
+        "dependsOn": ["Run Build"]
+      },
+      {
+        "label": "Publish",
+        "dependsOn": ["Push to GitHub", "Run Build", "Upload to PyPI", "Update package locally"],
+        "problemMatcher": []
+      }
+    ]
+  }
